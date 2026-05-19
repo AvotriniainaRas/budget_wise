@@ -1,3 +1,5 @@
+# Add a documentation to README.md
+
 # budget_wise
 
 A new Flutter project.
