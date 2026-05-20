@@ -29,14 +29,13 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppTheme.spacingXL),
 
-              // Résumé financier depuis Riverpod
               summaryAsync.when(
                 loading: () => const Center(
                   child: CircularProgressIndicator(),
                 ),
                 error: (e, _) => Text(
                   'Erreur : $e',
-                  style: TextStyle(color: AppColors.expense),
+                  style: const TextStyle(color: AppColors.expense),
                 ),
                 data: (summary) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,17 +54,17 @@ class DashboardScreen extends ConsumerWidget {
                     Row(
                       children: [
                         _SummaryChip(
-                          label: 'Revenus',
+                          label:  'Revenus',
                           amount: summary.totalIncome,
-                          color: AppColors.income,
-                          icon: Icons.arrow_upward_rounded,
+                          color:  AppColors.income,
+                          icon:   Icons.arrow_upward_rounded,
                         ),
                         const SizedBox(width: AppTheme.spacingM),
                         _SummaryChip(
-                          label: 'Dépenses',
+                          label:  'Dépenses',
                           amount: summary.totalExpense,
-                          color: AppColors.expense,
-                          icon: Icons.arrow_downward_rounded,
+                          color:  AppColors.expense,
+                          icon:   Icons.arrow_downward_rounded,
                         ),
                       ],
                     ),
@@ -88,9 +87,9 @@ class _SummaryChip extends StatelessWidget {
     required this.icon,
   });
 
-  final String  label;
-  final double  amount;
-  final Color   color;
+  final String   label;
+  final double   amount;
+  final Color    color;
   final IconData icon;
 
   @override
@@ -101,7 +100,7 @@ class _SummaryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color:        color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          border: Border.all(
+          border:       Border.all(
             color: color.withValues(alpha: 0.3),
           ),
         ),
