@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/theme.dart';
+import 'presentation/providers/providers.dart';
 
 /// Widget racine de l'application BudgetWise.
 ///
@@ -11,19 +12,16 @@ class BudgetWiseApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Riverpod observe le thème — l'UI se reconstruit
+    // automatiquement quand l'utilisateur change de mode.
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: 'BudgetWise',
       debugShowCheckedModeBanner: false,
-
-      // Thèmes clair et sombre définis dans AppTheme.
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-
-      // Suit les préférences système pour l'instant.
-      // On branchera un provider Riverpod ici plus tard.
-      themeMode: ThemeMode.system,
-
-      // Écran temporaire pour vérifier que tout compile.
+      theme:      AppTheme.light,
+      darkTheme:  AppTheme.dark,
+      themeMode:  themeMode,
       home: const _PlaceholderScreen(),
     );
   }
@@ -36,7 +34,7 @@ class _PlaceholderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final texts  = Theme.of(context).textTheme;
+    final texts = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -60,21 +58,21 @@ class _PlaceholderScreen extends StatelessWidget {
               // Aperçu des couleurs
               Text('Palette de couleurs', style: texts.headlineSmall),
               const SizedBox(height: AppTheme.spacingM),
-              _ColorRow(label: 'Primary',  color: AppColors.primary),
-              _ColorRow(label: 'Secondary',color: AppColors.secondary),
-              _ColorRow(label: 'Revenus',  color: AppColors.income),
-              _ColorRow(label: 'Dépenses', color: AppColors.expense),
-              _ColorRow(label: 'Épargne',  color: AppColors.savings),
+              const _ColorRow(label: 'Primary', color: AppColors.primary),
+              const _ColorRow(label: 'Secondary', color: AppColors.secondary),
+              const _ColorRow(label: 'Revenus', color: AppColors.income),
+              const _ColorRow(label: 'Dépenses', color: AppColors.expense),
+              const _ColorRow(label: 'Épargne', color: AppColors.savings),
 
               const SizedBox(height: AppTheme.spacingXL),
 
               // Aperçu des typographies
               Text('Typographie', style: texts.headlineSmall),
               const SizedBox(height: AppTheme.spacingM),
-              Text('Headline Large',  style: texts.headlineLarge),
+              Text('Headline Large', style: texts.headlineLarge),
               Text('Headline Medium', style: texts.headlineMedium),
-              Text('Body Large',      style: texts.bodyLarge),
-              Text('Body Small',      style: texts.bodySmall),
+              Text('Body Large', style: texts.bodyLarge),
+              Text('Body Small', style: texts.bodySmall),
               Text(
                 '1 234 500 Ar',
                 style: AppTextStyles.amount.copyWith(
@@ -94,7 +92,7 @@ class _ColorRow extends StatelessWidget {
   const _ColorRow({required this.label, required this.color});
 
   final String label;
-  final Color  color;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
