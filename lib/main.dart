@@ -5,9 +5,12 @@ import 'package:path_provider/path_provider.dart';
 import 'app.dart';
 import 'data/datasources/local/hive_datasource.dart';
 import 'data/models/models.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialise les données de localisation française.
+  await initializeDateFormatting('fr_FR', null);
 
   // getApplicationSupportDirectory() retourne un dossier
   // caché dédié à l'app — propre sur Linux, macOS et Windows.
