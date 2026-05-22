@@ -7,6 +7,7 @@ import '../screens/savings/add_savings_goal_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import 'app_scaffold.dart';
 
+
 /// Identifiants de routes — jamais de strings en dur dans les widgets.
 abstract final class AppRoutes {
   static const String dashboard       = '/';
