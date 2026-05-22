@@ -5,23 +5,27 @@ import '../screens/transactions/add_transaction_screen.dart';
 import '../screens/savings/savings_screen.dart';
 import '../screens/savings/add_savings_goal_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/statistics/statistics_screen.dart';
 import 'app_scaffold.dart';
-
+import '../screens/splash/splash_screen.dart';
+import '../../core/utils/transitions.dart';
 
 /// Identifiants de routes — jamais de strings en dur dans les widgets.
 abstract final class AppRoutes {
-  static const String dashboard       = '/';
-  static const String transactions    = '/transactions';
-  static const String addTransaction  = '/transactions/add';
+  static const String splash = '/splash';
+  static const String dashboard = '/';
+  static const String transactions = '/transactions';
+  static const String addTransaction = '/transactions/add';
   static const String editTransaction = '/transactions/edit/:id';
-  static const String savings         = '/savings';
-  static const String addSavingsGoal  = '/savings/add';
-  static const String settings        = '/settings';
+  static const String savings = '/savings';
+  static const String addSavingsGoal = '/savings/add';
+  static const String statistics = '/statistics';
+  static const String settings = '/settings';
 }
 
 /// Configuration centrale de la navigation.
 final appRouter = GoRouter(
-  initialLocation: AppRoutes.dashboard,
+  initialLocation: AppRoutes.splash,
   debugLogDiagnostics: false,
   routes: [
     // Shell route — enveloppe tous les écrans principaux
@@ -30,27 +34,42 @@ final appRouter = GoRouter(
       builder: (context, state, child) => AppScaffold(child: child),
       routes: [
         GoRoute(
+          path: AppRoutes.splash,
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
           path: AppRoutes.dashboard,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: DashboardScreen(),
+          pageBuilder: (context, state) => AppTransitions.fade(
+            key: state.pageKey,
+            child: const DashboardScreen(),
           ),
         ),
         GoRoute(
           path: AppRoutes.transactions,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: TransactionsScreen(),
+          pageBuilder: (context, state) => AppTransitions.fade(
+            key: state.pageKey,
+            child: const TransactionsScreen(),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.statistics,
+          pageBuilder: (context, state) => AppTransitions.fade(
+            key: state.pageKey,
+            child: const StatisticsScreen(),
           ),
         ),
         GoRoute(
           path: AppRoutes.savings,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: SavingsScreen(),
+          pageBuilder: (context, state) => AppTransitions.fade(
+            key: state.pageKey,
+            child: const SavingsScreen(),
           ),
         ),
         GoRoute(
           path: AppRoutes.settings,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: SettingsScreen(),
+          pageBuilder: (context, state) => AppTransitions.fade(
+            key: state.pageKey,
+            child: const SettingsScreen(),
           ),
         ),
       ],
@@ -59,18 +78,27 @@ final appRouter = GoRouter(
     // Routes modales — hors du shell (pas de bottom nav)
     GoRoute(
       path: AppRoutes.addTransaction,
-      builder: (context, state) => const AddTransactionScreen(),
+      pageBuilder: (context, state) => AppTransitions.slideUp(
+        key: state.pageKey,
+        child: const AddTransactionScreen(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.editTransaction,
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id']!;
-        return AddTransactionScreen(transactionId: id);
+        return AppTransitions.slideUp(
+          key: state.pageKey,
+          child: AddTransactionScreen(transactionId: id),
+        );
       },
     ),
     GoRoute(
       path: AppRoutes.addSavingsGoal,
-      builder: (context, state) => const AddSavingsGoalScreen(),
+      pageBuilder: (context, state) => AppTransitions.slideUp(
+        key: state.pageKey,
+        child: const AddSavingsGoalScreen(),
+      ),
     ),
   ],
 );

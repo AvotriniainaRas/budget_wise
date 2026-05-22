@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme.dart';
 import '../../../domain/usecases/transaction/get_monthly_summary.dart';
+import '../../widgets/common/animated_counter.dart';
 
 /// Grande carte affichant le solde du mois.
 class BalanceCard extends StatelessWidget {
@@ -14,12 +15,12 @@ class BalanceCard extends StatelessWidget {
     final formatter = NumberFormat('#,###', 'fr_FR');
 
     return Container(
-      width:   double.infinity,
+      width: double.infinity,
       padding: const EdgeInsets.all(AppTheme.spacingL),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin:  Alignment.topLeft,
-          end:    Alignment.bottomRight,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: summary.isPositive
               ? [AppColors.primary, AppColors.primaryDark]
               : [AppColors.expense, const Color(0xFFB71C1C)],
@@ -33,14 +34,16 @@ class BalanceCard extends StatelessWidget {
           Text(
             'Solde du mois',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
+                  color: Colors.white.withValues(alpha: 0.8),
+                ),
           ),
           const SizedBox(height: AppTheme.spacingS),
 
           // Montant principal
-          Text(
-            '${formatter.format(summary.balance.abs())} Ar',
+          AnimatedCounter(
+            value: summary.balance.abs(),
+            prefix: '',
+            suffix: ' Ar',
             style: AppTextStyles.displayLarge.copyWith(
               color: Colors.white,
             ),
@@ -63,8 +66,8 @@ class BalanceCard extends StatelessWidget {
                     ? 'Taux d\'épargne : ${summary.savingsRate.toStringAsFixed(1)}%'
                     : 'Dépenses supérieures aux revenus',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
               ),
             ],
           ),
@@ -78,19 +81,19 @@ class BalanceCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _BalanceItem(
-                  label:  'Revenus',
+                  label: 'Revenus',
                   amount: summary.totalIncome,
-                  icon:   Icons.arrow_upward_rounded,
-                  color:  const Color(0xFF81C784),
+                  icon: Icons.arrow_upward_rounded,
+                  color: const Color(0xFF81C784),
                   formatter: formatter,
                 ),
               ),
               Expanded(
                 child: _BalanceItem(
-                  label:  'Dépenses',
+                  label: 'Dépenses',
                   amount: summary.totalExpense,
-                  icon:   Icons.arrow_downward_rounded,
-                  color:  const Color(0xFFEF9A9A),
+                  icon: Icons.arrow_downward_rounded,
+                  color: const Color(0xFFEF9A9A),
                   formatter: formatter,
                 ),
               ),
@@ -111,20 +114,20 @@ class _BalanceItem extends StatelessWidget {
     required this.formatter,
   });
 
-  final String          label;
-  final double          amount;
-  final IconData        icon;
-  final Color           color;
-  final NumberFormat    formatter;
+  final String label;
+  final double amount;
+  final IconData icon;
+  final Color color;
+  final NumberFormat formatter;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Container(
-          padding:     const EdgeInsets.all(AppTheme.spacingXS),
-          decoration:  BoxDecoration(
-            color:        Colors.white.withValues(alpha: 0.15),
+          padding: const EdgeInsets.all(AppTheme.spacingXS),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(AppTheme.spacingS),
           ),
           child: Icon(icon, color: color, size: 16),
@@ -136,13 +139,13 @@ class _BalanceItem extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white.withValues(alpha: 0.7),
-              ),
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
             ),
             Text(
               '${formatter.format(amount)} Ar',
               style: AppTextStyles.amountSmall.copyWith(
-                color:    Colors.white,
+                color: Colors.white,
                 fontSize: 14,
               ),
             ),

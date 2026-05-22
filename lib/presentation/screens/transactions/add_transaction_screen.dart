@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/theme/theme.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
+import '../../../core/utils/date_picker_helper.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key, this.transactionId});
@@ -17,18 +18,17 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
       _AddTransactionScreenState();
 }
 
-class _AddTransactionScreenState
-    extends ConsumerState<AddTransactionScreen> {
-  final _formKey    = GlobalKey<FormState>();
-  final _titleCtrl  = TextEditingController();
+class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
-  final _noteCtrl   = TextEditingController();
+  final _noteCtrl = TextEditingController();
 
-  TransactionType _type         = TransactionType.expense;
-  String?         _categoryId;
-  DateTime        _date         = DateTime.now();
-  bool            _isLoading    = false;
-  bool            _isEditMode   = false;
+  TransactionType _type = TransactionType.expense;
+  String? _categoryId;
+  DateTime _date = DateTime.now();
+  bool _isLoading = false;
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -43,12 +43,12 @@ class _AddTransactionScreenState
     if (transaction == null) return;
 
     setState(() {
-      _titleCtrl.text  = transaction.title;
+      _titleCtrl.text = transaction.title;
       _amountCtrl.text = transaction.amount.toStringAsFixed(0);
-      _noteCtrl.text   = transaction.note ?? '';
-      _type            = transaction.type;
-      _categoryId      = transaction.categoryId;
-      _date            = transaction.date;
+      _noteCtrl.text = transaction.note ?? '';
+      _type = transaction.type;
+      _categoryId = transaction.categoryId;
+      _date = transaction.date;
     });
   }
 
@@ -71,15 +71,13 @@ class _AddTransactionScreenState
 
     try {
       final transaction = Transaction(
-        id:         widget.transactionId ?? const Uuid().v4(),
-        title:      _titleCtrl.text.trim(),
-        amount:     double.parse(_amountCtrl.text.replaceAll(',', '.')),
-        type:       _type,
+        id: widget.transactionId ?? const Uuid().v4(),
+        title: _titleCtrl.text.trim(),
+        amount: double.parse(_amountCtrl.text.replaceAll(',', '.')),
+        type: _type,
         categoryId: _categoryId!,
-        date:       _date,
-        note:       _noteCtrl.text.trim().isEmpty
-                        ? null
-                        : _noteCtrl.text.trim(),
+        date: _date,
+        note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
       );
 
       if (_isEditMode) {
@@ -104,16 +102,16 @@ class _AddTransactionScreenState
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title:   const Text('Supprimer la transaction ?'),
+        title: const Text('Supprimer la transaction ?'),
         content: const Text('Cette action est irréversible.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child:     const Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style:     TextButton.styleFrom(
+            style: TextButton.styleFrom(
               foregroundColor: AppColors.expense,
             ),
             child: const Text('Supprimer'),
@@ -134,21 +132,22 @@ class _AddTransactionScreenState
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:          Text(message),
-        backgroundColor:  AppColors.expense,
+        content: Text(message),
+        backgroundColor: AppColors.expense,
       ),
     );
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context:      context,
-      initialDate:  _date,
-      firstDate:    DateTime(2020),
-      lastDate:     DateTime.now(),
-      locale:       const Locale('fr', 'FR'),
+    final picked = await showAppDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
     );
-    if (picked != null) setState(() => _date = picked);
+    if (picked != null && mounted) {
+      setState(() => _date = picked);
+    }
   }
 
   @override
@@ -160,8 +159,8 @@ class _AddTransactionScreenState
         actions: [
           if (_isEditMode)
             IconButton(
-              icon:    const Icon(Icons.delete_outline_rounded),
-              color:   AppColors.expense,
+              icon: const Icon(Icons.delete_outline_rounded),
+              color: AppColors.expense,
               onPressed: _delete,
             ),
         ],
@@ -173,32 +172,32 @@ class _AddTransactionScreenState
           children: [
             // ── Type : Revenu / Dépense ───────────────────
             _TypeSelector(
-              selected:  _type,
+              selected: _type,
               onChanged: (type) => setState(() {
-                _type       = type;
+                _type = type;
                 _categoryId = null;
               }),
             ),
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Montant ───────────────────────────────────
-            _SectionLabel(label: 'Montant (Ar)'),
+            const _SectionLabel(label: 'Montant (Ar)'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
-              controller:  _amountCtrl,
+              controller: _amountCtrl,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
               ],
-              style:       AppTextStyles.amount.copyWith(
-                color:    AppColors.primary,
+              style: AppTextStyles.amount.copyWith(
+                color: AppColors.primary,
                 fontSize: 28,
               ),
               decoration: const InputDecoration(
-                hintText:    '0',
-                prefixText:  'Ar  ',
+                hintText: '0',
+                prefixText: 'Ar  ',
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Montant requis';
@@ -214,10 +213,10 @@ class _AddTransactionScreenState
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Titre ─────────────────────────────────────
-            _SectionLabel(label: 'Description'),
+            const _SectionLabel(label: 'Description'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
-              controller:  _titleCtrl,
+              controller: _titleCtrl,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 hintText: 'Ex : Courses, Salaire...',
@@ -229,27 +228,27 @@ class _AddTransactionScreenState
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Catégorie ─────────────────────────────────
-            _SectionLabel(label: 'Catégorie'),
+            const _SectionLabel(label: 'Catégorie'),
             const SizedBox(height: AppTheme.spacingS),
             _CategorySelector(
-              selectedId:  _categoryId,
-              type:        _type,
-              onSelected:  (id) => setState(() => _categoryId = id),
+              selectedId: _categoryId,
+              type: _type,
+              onSelected: (id) => setState(() => _categoryId = id),
             ),
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Date ──────────────────────────────────────
-            _SectionLabel(label: 'Date'),
+            const _SectionLabel(label: 'Date'),
             const SizedBox(height: AppTheme.spacingS),
             _DateSelector(date: _date, onTap: _pickDate),
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Note (optionnel) ──────────────────────────
-            _SectionLabel(label: 'Note (optionnel)'),
+            const _SectionLabel(label: 'Note (optionnel)'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
               controller: _noteCtrl,
-              maxLines:   3,
+              maxLines: 3,
               decoration: const InputDecoration(
                 hintText: 'Ajouter une note...',
               ),
@@ -262,9 +261,9 @@ class _AddTransactionScreenState
               child: _isLoading
                   ? const SizedBox(
                       height: 20,
-                      width:  20,
-                      child:  CircularProgressIndicator(
-                        color:       Colors.white,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
                         strokeWidth: 2,
                       ),
                     )
@@ -291,8 +290,8 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       label,
       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: AppColors.textSecondary,
-      ),
+            color: AppColors.textSecondary,
+          ),
     );
   }
 }
@@ -303,32 +302,32 @@ class _TypeSelector extends StatelessWidget {
     required this.onChanged,
   });
 
-  final TransactionType             selected;
+  final TransactionType selected;
   final ValueChanged<TransactionType> onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:        Theme.of(context).cardTheme.color,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         children: [
           _TypeTab(
-            label:    'Dépense',
-            icon:     Icons.arrow_downward_rounded,
-            color:    AppColors.expense,
+            label: 'Dépense',
+            icon: Icons.arrow_downward_rounded,
+            color: AppColors.expense,
             selected: selected == TransactionType.expense,
-            onTap:    () => onChanged(TransactionType.expense),
+            onTap: () => onChanged(TransactionType.expense),
           ),
           _TypeTab(
-            label:    'Revenu',
-            icon:     Icons.arrow_upward_rounded,
-            color:    AppColors.income,
+            label: 'Revenu',
+            icon: Icons.arrow_upward_rounded,
+            color: AppColors.income,
             selected: selected == TransactionType.income,
-            onTap:    () => onChanged(TransactionType.income),
+            onTap: () => onChanged(TransactionType.income),
           ),
         ],
       ),
@@ -345,10 +344,10 @@ class _TypeTab extends StatelessWidget {
     required this.onTap,
   });
 
-  final String   label;
+  final String label;
   final IconData icon;
-  final Color    color;
-  final bool     selected;
+  final Color color;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
@@ -357,27 +356,26 @@ class _TypeTab extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration:    const Duration(milliseconds: 200),
-          padding:     const EdgeInsets.symmetric(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(
             vertical: AppTheme.spacingM,
           ),
-          decoration:  BoxDecoration(
-            color:        selected
-                ? color.withValues(alpha: 0.12)
-                : Colors.transparent,
+          decoration: BoxDecoration(
+            color:
+                selected ? color.withValues(alpha: 0.12) : Colors.transparent,
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: selected ? color : AppColors.textHint,
-                  size: 18),
+              Icon(icon,
+                  color: selected ? color : AppColors.textHint, size: 18),
               const SizedBox(width: AppTheme.spacingXS),
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: selected ? color : AppColors.textHint,
-                ),
+                      color: selected ? color : AppColors.textHint,
+                    ),
               ),
             ],
           ),
@@ -394,8 +392,8 @@ class _CategorySelector extends ConsumerWidget {
     required this.onSelected,
   });
 
-  final String?              selectedId;
-  final TransactionType      type;
+  final String? selectedId;
+  final TransactionType type;
   final ValueChanged<String> onSelected;
 
   @override
@@ -406,29 +404,27 @@ class _CategorySelector extends ConsumerWidget {
 
     return categoriesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error:   (e, _) => Text('Erreur : $e'),
+      error: (e, _) => Text('Erreur : $e'),
       data: (categories) => Wrap(
-        spacing:     AppTheme.spacingS,
-        runSpacing:  AppTheme.spacingS,
-        children:    categories.map((category) {
+        spacing: AppTheme.spacingS,
+        runSpacing: AppTheme.spacingS,
+        children: categories.map((category) {
           final isSelected = category.id == selectedId;
           return GestureDetector(
             onTap: () => onSelected(category.id),
             child: AnimatedContainer(
-              duration:   const Duration(milliseconds: 200),
-              padding:    const EdgeInsets.symmetric(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(
                 horizontal: AppTheme.spacingM,
-                vertical:   AppTheme.spacingS,
+                vertical: AppTheme.spacingS,
               ),
               decoration: BoxDecoration(
-                color:        isSelected
+                color: isSelected
                     ? category.color.withValues(alpha: 0.15)
                     : Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 border: Border.all(
-                  color: isSelected
-                      ? category.color
-                      : AppColors.divider,
+                  color: isSelected ? category.color : AppColors.divider,
                   width: isSelected ? 1.5 : 1,
                 ),
               ),
@@ -437,22 +433,20 @@ class _CategorySelector extends ConsumerWidget {
                 children: [
                   Icon(
                     category.icon,
-                    color: isSelected
-                        ? category.color
-                        : AppColors.textSecondary,
+                    color:
+                        isSelected ? category.color : AppColors.textSecondary,
                     size: 16,
                   ),
                   const SizedBox(width: AppTheme.spacingXS),
                   Text(
                     category.name,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isSelected
-                          ? category.color
-                          : AppColors.textSecondary,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
+                          color: isSelected
+                              ? category.color
+                              : AppColors.textSecondary,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                        ),
                   ),
                 ],
               ),
@@ -470,7 +464,7 @@ class _DateSelector extends StatelessWidget {
     required this.onTap,
   });
 
-  final DateTime     date;
+  final DateTime date;
   final VoidCallback onTap;
 
   @override
@@ -480,7 +474,7 @@ class _DateSelector extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppTheme.spacingM),
         decoration: BoxDecoration(
-          color:        Theme.of(context).cardTheme.color,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           border: Border.all(color: AppColors.divider),
         ),
@@ -489,7 +483,7 @@ class _DateSelector extends StatelessWidget {
             const Icon(
               Icons.calendar_today_rounded,
               color: AppColors.primary,
-              size:  20,
+              size: 20,
             ),
             const SizedBox(width: AppTheme.spacingM),
             Text(

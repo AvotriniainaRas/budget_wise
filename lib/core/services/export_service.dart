@@ -137,7 +137,7 @@ class ExportService {
         ),
         pw.Text(
           'Export du ${date.toReadable()}',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 10,
             color:    PdfColors.grey600,
           ),
@@ -152,7 +152,7 @@ class ExportService {
       children: [
         pw.Text(
           'Page ${context.pageNumber} / ${context.pagesCount}',
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 10,
             color:    PdfColors.grey600,
           ),

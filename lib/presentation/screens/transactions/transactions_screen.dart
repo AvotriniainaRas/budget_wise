@@ -45,12 +45,12 @@ class TransactionsScreen extends ConsumerWidget {
             ),
 
             // ── Sélecteur de mois ────────────────────────
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: AppTheme.spacingL,
                 ),
-                child: const MonthSelector(),
+                child: MonthSelector(),
               ),
             ),
 

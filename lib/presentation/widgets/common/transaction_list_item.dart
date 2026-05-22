@@ -27,7 +27,7 @@ class TransactionListItem extends ConsumerWidget {
       data: (categories) {
         final category = categories.firstWhere(
           (c) => c.id == transaction.categoryId,
-          orElse: () => Category(
+          orElse: () => const Category(
             id:    '',
             name:  'Autre',
             icon:  Icons.category_rounded,

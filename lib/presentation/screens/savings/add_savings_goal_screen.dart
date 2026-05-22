@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/theme/theme.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
+import '../../../core/utils/date_picker_helper.dart';
 
 class AddSavingsGoalScreen extends ConsumerStatefulWidget {
   const AddSavingsGoalScreen({super.key});
@@ -15,16 +16,15 @@ class AddSavingsGoalScreen extends ConsumerStatefulWidget {
       _AddSavingsGoalScreenState();
 }
 
-class _AddSavingsGoalScreenState
-    extends ConsumerState<AddSavingsGoalScreen> {
-  final _formKey      = GlobalKey<FormState>();
-  final _titleCtrl    = TextEditingController();
-  final _amountCtrl   = TextEditingController();
-  final _currentCtrl  = TextEditingController();
-  final _noteCtrl     = TextEditingController();
+class _AddSavingsGoalScreenState extends ConsumerState<AddSavingsGoalScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleCtrl = TextEditingController();
+  final _amountCtrl = TextEditingController();
+  final _currentCtrl = TextEditingController();
+  final _noteCtrl = TextEditingController();
 
-  DateTime _deadline  = DateTime.now().add(const Duration(days: 30));
-  bool     _isLoading = false;
+  DateTime _deadline = DateTime.now().add(const Duration(days: 30));
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -36,14 +36,15 @@ class _AddSavingsGoalScreenState
   }
 
   Future<void> _pickDeadline() async {
-    final picked = await showDatePicker(
-      context:     context,
+    final picked = await showAppDatePicker(
+      context: context,
       initialDate: _deadline,
-      firstDate:   DateTime.now().add(const Duration(days: 1)),
-      lastDate:    DateTime.now().add(const Duration(days: 3650)),
-      locale:      const Locale('fr', 'FR'),
+      firstDate: DateTime.now().add(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 3650)),
     );
-    if (picked != null) setState(() => _deadline = picked);
+    if (picked != null && mounted) {
+      setState(() => _deadline = picked);
+    }
   }
 
   Future<void> _submit() async {
@@ -53,18 +54,16 @@ class _AddSavingsGoalScreenState
 
     try {
       final goal = SavingsGoal(
-        id:            const Uuid().v4(),
-        title:         _titleCtrl.text.trim(),
-        targetAmount:  double.parse(
+        id: const Uuid().v4(),
+        title: _titleCtrl.text.trim(),
+        targetAmount: double.parse(
           _amountCtrl.text.replaceAll(',', '.'),
         ),
         currentAmount: _currentCtrl.text.isEmpty
             ? 0
             : double.parse(_currentCtrl.text.replaceAll(',', '.')),
-        deadline:      _deadline,
-        note:          _noteCtrl.text.trim().isEmpty
-            ? null
-            : _noteCtrl.text.trim(),
+        deadline: _deadline,
+        note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
       );
 
       await ref.read(addSavingsGoalProvider).call(goal);
@@ -77,7 +76,7 @@ class _AddSavingsGoalScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:         Text('Erreur : $e'),
+            content: Text('Erreur : $e'),
             backgroundColor: AppColors.expense,
           ),
         );
@@ -99,27 +98,25 @@ class _AddSavingsGoalScreenState
         child: ListView(
           padding: const EdgeInsets.all(AppTheme.spacingL),
           children: [
-
             // ── Titre ────────────────────────────────
-            _Label('Nom de l\'objectif'),
+            const _Label('Nom de l\'objectif'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
-              controller:         _titleCtrl,
+              controller: _titleCtrl,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 hintText: 'Ex : Vacances, Téléphone...',
               ),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'Nom requis'
-                  : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Nom requis' : null,
             ),
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Montant cible ────────────────────────
-            _Label('Montant cible (Ar)'),
+            const _Label('Montant cible (Ar)'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
-              controller:  _amountCtrl,
+              controller: _amountCtrl,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -127,11 +124,11 @@ class _AddSavingsGoalScreenState
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
               ],
               style: AppTextStyles.amount.copyWith(
-                color:    AppColors.savings,
+                color: AppColors.primary,
                 fontSize: 24,
               ),
               decoration: const InputDecoration(
-                hintText:   '0',
+                hintText: '0',
                 prefixText: 'Ar  ',
               ),
               validator: (v) {
@@ -146,10 +143,10 @@ class _AddSavingsGoalScreenState
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Montant déjà épargné ─────────────────
-            _Label('Déjà épargné (optionnel)'),
+            const _Label('Déjà épargné (optionnel)'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
-              controller:  _currentCtrl,
+              controller: _currentCtrl,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -157,21 +154,21 @@ class _AddSavingsGoalScreenState
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
               ],
               decoration: const InputDecoration(
-                hintText:   '0',
+                hintText: '0',
                 prefixText: 'Ar  ',
               ),
             ),
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Date limite ──────────────────────────
-            _Label('Date limite'),
+            const _Label('Date limite'),
             const SizedBox(height: AppTheme.spacingS),
             GestureDetector(
               onTap: _pickDeadline,
               child: Container(
-                padding:    const EdgeInsets.all(AppTheme.spacingM),
+                padding: const EdgeInsets.all(AppTheme.spacingM),
                 decoration: BoxDecoration(
-                  color:        Theme.of(context).cardTheme.color,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                   border: Border.all(color: AppColors.divider),
                 ),
@@ -179,8 +176,8 @@ class _AddSavingsGoalScreenState
                   children: [
                     const Icon(
                       Icons.event_rounded,
-                      color: AppColors.savings,
-                      size:  20,
+                      color: AppColors.primary,
+                      size: 20,
                     ),
                     const SizedBox(width: AppTheme.spacingM),
                     Text(
@@ -193,8 +190,8 @@ class _AddSavingsGoalScreenState
                     Text(
                       '${_deadline.difference(DateTime.now()).inDays} jours',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.savings,
-                      ),
+                            color: AppColors.primary,
+                          ),
                     ),
                     const Icon(
                       Icons.chevron_right_rounded,
@@ -207,11 +204,11 @@ class _AddSavingsGoalScreenState
             const SizedBox(height: AppTheme.spacingL),
 
             // ── Note ─────────────────────────────────
-            _Label('Note (optionnel)'),
+            const _Label('Note (optionnel)'),
             const SizedBox(height: AppTheme.spacingS),
             TextFormField(
               controller: _noteCtrl,
-              maxLines:   3,
+              maxLines: 3,
               decoration: const InputDecoration(
                 hintText: 'Pourquoi cet objectif ?',
               ),
@@ -221,15 +218,15 @@ class _AddSavingsGoalScreenState
             // ── Bouton ────────────────────────────────
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.savings,
+                backgroundColor: AppColors.primary,
               ),
               onPressed: _isLoading ? null : _submit,
-              child:     _isLoading
+              child: _isLoading
                   ? const SizedBox(
                       height: 20,
-                      width:  20,
-                      child:  CircularProgressIndicator(
-                        color:       Colors.white,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
                         strokeWidth: 2,
                       ),
                     )
@@ -252,8 +249,8 @@ class _Label extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: AppColors.textSecondary,
-      ),
+            color: AppColors.textSecondary,
+          ),
     );
   }
 }

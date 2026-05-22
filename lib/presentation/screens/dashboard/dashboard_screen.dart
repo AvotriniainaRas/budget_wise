@@ -22,13 +22,24 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
 
-      // Bouton d'ajout rapide
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed:    () => context.push(AppRoutes.addTransaction),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        icon:          const Icon(Icons.add_rounded),
-        label:         const Text('Ajouter'),
+      // Bouton d'ajout rapide animé
+      floatingActionButton: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.elasticOut,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: value,
+            child: child,
+          );
+        },
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push(AppRoutes.addTransaction),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Ajouter'),
+        ),
       ),
 
       body: SafeArea(
@@ -67,7 +78,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       // Avatar placeholder
                       CircleAvatar(
-                        radius:          22,
+                        radius: 22,
                         backgroundColor: AppColors.primary
                             .withValues(alpha: 0.15),
                         child: const Icon(
@@ -81,12 +92,12 @@ class DashboardScreen extends ConsumerWidget {
               ),
 
               // ── Sélecteur de mois ─────────────────────────
-              SliverToBoxAdapter(
+              const SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: AppTheme.spacingL,
                   ),
-                  child: const MonthSelector(),
+                  child: MonthSelector(),
                 ),
               ),
 
@@ -102,8 +113,8 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   child: summaryAsync.when(
                     loading: () => const _LoadingCard(),
-                    error:   (e, _) => _ErrorCard(message: e.toString()),
-                    data:    (summary) => BalanceCard(summary: summary),
+                    error: (e, _) => _ErrorCard(message: e.toString()),
+                    data: (summary) => BalanceCard(summary: summary),
                   ),
                 ),
               ),
@@ -150,8 +161,8 @@ class DashboardScreen extends ConsumerWidget {
                   if (transactions.isEmpty) {
                     return const SliverToBoxAdapter(
                       child: EmptyState(
-                        icon:     Icons.receipt_long_rounded,
-                        title:    'Aucune transaction',
+                        icon: Icons.receipt_long_rounded,
+                        title: 'Aucune transaction',
                         subtitle: 'Appuyez sur + pour ajouter\nvotre première transaction.',
                       ),
                     );
@@ -197,9 +208,9 @@ class _LoadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height:      180,
-      decoration:  BoxDecoration(
-        color:        AppColors.primary.withValues(alpha: 0.1),
+      height: 180,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusXL),
       ),
       child: const Center(child: CircularProgressIndicator()),
@@ -215,14 +226,14 @@ class _ErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:     const EdgeInsets.all(AppTheme.spacingM),
-      decoration:  BoxDecoration(
-        color:        AppColors.expense.withValues(alpha: 0.1),
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppColors.expense.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       ),
       child: Text(
         'Erreur : $message',
-        style: TextStyle(color: AppColors.expense),
+        style: const TextStyle(color: AppColors.expense),
       ),
     );
   }

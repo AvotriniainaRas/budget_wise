@@ -40,24 +40,29 @@ class _BottomNav extends StatelessWidget {
       onDestinationSelected: (index) => _onTap(context, index),
       destinations: const [
         NavigationDestination(
-          icon:          Icon(Icons.dashboard_outlined),
-          selectedIcon:  Icon(Icons.dashboard_rounded),
-          label:         'Tableau de bord',
+          icon: Icon(Icons.dashboard_outlined),
+          selectedIcon: Icon(Icons.dashboard_rounded),
+          label: 'Tableau de bord',
         ),
         NavigationDestination(
-          icon:          Icon(Icons.receipt_long_outlined),
-          selectedIcon:  Icon(Icons.receipt_long_rounded),
-          label:         'Transactions',
+          icon: Icon(Icons.receipt_long_outlined),
+          selectedIcon: Icon(Icons.receipt_long_rounded),
+          label: 'Transactions',
         ),
         NavigationDestination(
-          icon:          Icon(Icons.savings_outlined),
-          selectedIcon:  Icon(Icons.savings_rounded),
-          label:         'Épargne',
+          icon: Icon(Icons.bar_chart_outlined),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
+          label: 'Statistiques',
         ),
         NavigationDestination(
-          icon:          Icon(Icons.settings_outlined),
-          selectedIcon:  Icon(Icons.settings_rounded),
-          label:         'Paramètres',
+          icon: Icon(Icons.savings_outlined),
+          selectedIcon: Icon(Icons.savings_rounded),
+          label: 'Épargne',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings_rounded),
+          label: 'Paramètres',
         ),
       ],
     );
@@ -65,17 +70,19 @@ class _BottomNav extends StatelessWidget {
 
   int _selectedIndex(String location) {
     if (location.startsWith(AppRoutes.transactions)) return 1;
-    if (location.startsWith(AppRoutes.savings))      return 2;
-    if (location.startsWith(AppRoutes.settings))     return 3;
+    if (location.startsWith(AppRoutes.statistics)) return 2;
+    if (location.startsWith(AppRoutes.savings)) return 3;
+    if (location.startsWith(AppRoutes.settings)) return 4;
     return 0;
   }
 
   void _onTap(BuildContext context, int index) {
     switch (index) {
-      case 0: context.go(AppRoutes.dashboard);    break;
+      case 0: context.go(AppRoutes.dashboard); break;
       case 1: context.go(AppRoutes.transactions); break;
-      case 2: context.go(AppRoutes.savings);      break;
-      case 3: context.go(AppRoutes.settings);     break;
+      case 2: context.go(AppRoutes.statistics); break;
+      case 3: context.go(AppRoutes.savings); break;
+      case 4: context.go(AppRoutes.settings); break;
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/theme.dart';
 import 'presentation/navigation/app_router.dart';
@@ -18,6 +19,18 @@ class BudgetWiseApp extends ConsumerWidget {
       darkTheme:                  AppTheme.dark,
       themeMode:                  themeMode,
       routerConfig:               appRouter,
+
+      // ── Localisation française ──────────────────────
+      locale: const Locale('fr', 'FR'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('fr', 'FR'),
+        Locale('en', 'US'),
+      ],
     );
   }
 }

@@ -13,22 +13,21 @@ class SavingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeAsync    = ref.watch(activeSavingsGoalsProvider);
+    final activeAsync = ref.watch(activeSavingsGoalsProvider);
     final completedAsync = ref.watch(savingsGoalsProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed:       () => context.push(AppRoutes.addSavingsGoal),
-        backgroundColor: AppColors.savings,
+        onPressed: () => context.push(AppRoutes.addSavingsGoal),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        icon:            const Icon(Icons.add_rounded),
-        label:           const Text('Nouvel objectif'),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Nouvel objectif'),
       ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-
             // ── En-tête ────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
@@ -47,7 +46,9 @@ class SavingsScreen extends ConsumerWidget {
                     ),
                     Text(
                       'Suivez vos objectifs financiers',
-                      style: Theme.of(context).textTheme.bodyMedium
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
                           ?.copyWith(color: AppColors.textSecondary),
                     ),
                   ],
@@ -97,8 +98,8 @@ class SavingsScreen extends ConsumerWidget {
                 if (goals.isEmpty) {
                   return const SliverToBoxAdapter(
                     child: EmptyState(
-                      icon:     Icons.savings_rounded,
-                      title:    'Aucun objectif en cours',
+                      icon: Icons.savings_rounded,
+                      title: 'Aucun objectif en cours',
                       subtitle: 'Créez votre premier objectif\nd\'épargne !',
                     ),
                   );
@@ -122,11 +123,9 @@ class SavingsScreen extends ConsumerWidget {
             // ── Objectifs complétés ────────────────────
             completedAsync.when(
               loading: () => const SliverToBoxAdapter(child: SizedBox()),
-              error:   (_, __) => const SliverToBoxAdapter(child: SizedBox()),
+              error: (_, __) => const SliverToBoxAdapter(child: SizedBox()),
               data: (allGoals) {
-                final completed = allGoals
-                    .where((g) => g.isCompleted)
-                    .toList();
+                final completed = allGoals.where((g) => g.isCompleted).toList();
                 if (completed.isEmpty) {
                   return const SliverToBoxAdapter(child: SizedBox());
                 }
@@ -156,7 +155,7 @@ class SavingsScreen extends ConsumerWidget {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => _SavingsGoalCard(
-                            goal:        completed[index],
+                            goal: completed[index],
                             isCompleted: true,
                           ),
                           childCount: completed.length,
@@ -183,27 +182,28 @@ class _SavingsSummaryCard extends ConsumerWidget {
 
     return goalsAsync.when(
       loading: () => const SizedBox.shrink(),
-      error:   (_, __) => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
       data: (goals) {
-        final totalTarget  = goals.fold<double>(
-          0, (sum, g) => sum + g.targetAmount,
+        final totalTarget = goals.fold<double>(
+          0,
+          (sum, g) => sum + g.targetAmount,
         );
         final totalCurrent = goals.fold<double>(
-          0, (sum, g) => sum + g.currentAmount,
+          0,
+          (sum, g) => sum + g.currentAmount,
         );
-        final totalProgress = totalTarget == 0
-            ? 0.0
-            : totalCurrent / totalTarget;
+        final totalProgress =
+            totalTarget == 0 ? 0.0 : totalCurrent / totalTarget;
 
         final formatter = NumberFormat('#,###', 'fr_FR');
 
         return Container(
-          padding:    const EdgeInsets.all(AppTheme.spacingL),
+          padding: const EdgeInsets.all(AppTheme.spacingL),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              begin:  Alignment.topLeft,
-              end:    Alignment.bottomRight,
-              colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primary, AppColors.primaryDark],
             ),
             borderRadius: BorderRadius.circular(AppTheme.radiusXL),
           ),
@@ -213,8 +213,8 @@ class _SavingsSummaryCard extends ConsumerWidget {
               Text(
                 'Total épargné',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
               ),
               const SizedBox(height: AppTheme.spacingS),
               Text(
@@ -227,8 +227,8 @@ class _SavingsSummaryCard extends ConsumerWidget {
               Text(
                 'sur ${formatter.format(totalTarget)} Ar visés',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
               ),
               const SizedBox(height: AppTheme.spacingM),
 
@@ -236,8 +236,8 @@ class _SavingsSummaryCard extends ConsumerWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value:            totalProgress,
-                  backgroundColor:  Colors.white.withValues(alpha: 0.3),
+                  value: totalProgress,
+                  backgroundColor: Colors.white.withValues(alpha: 0.3),
                   valueColor: const AlwaysStoppedAnimation<Color>(
                     Colors.white,
                   ),
@@ -251,14 +251,14 @@ class _SavingsSummaryCard extends ConsumerWidget {
                   Text(
                     '${(totalProgress * 100).toStringAsFixed(1)}% atteint',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                   ),
                   Text(
                     '${goals.length} objectif${goals.length > 1 ? 's' : ''}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                   ),
                 ],
               ),
@@ -279,18 +279,18 @@ class _SavingsGoalCard extends ConsumerWidget {
   });
 
   final SavingsGoal goal;
-  final bool        isCompleted;
+  final bool isCompleted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formatter = NumberFormat('#,###', 'fr_FR');
-    final daysLeft  = goal.deadline.difference(DateTime.now()).inDays;
+    final daysLeft = goal.deadline.difference(DateTime.now()).inDays;
 
     return Container(
-      margin:  const EdgeInsets.only(bottom: AppTheme.spacingM),
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
       padding: const EdgeInsets.all(AppTheme.spacingM),
       decoration: BoxDecoration(
-        color:        Theme.of(context).cardTheme.color,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(
           color: isCompleted
@@ -301,26 +301,25 @@ class _SavingsGoalCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // ── Titre + actions ───────────────────────────
           Row(
             children: [
               // Icône
               Container(
-                width:       44,
-                height:      44,
-                decoration:  BoxDecoration(
-                  color:        isCompleted
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isCompleted
                       ? AppColors.income.withValues(alpha: 0.15)
-                      : AppColors.savings.withValues(alpha: 0.15),
+                      : AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
                 child: Icon(
                   isCompleted
                       ? Icons.check_circle_rounded
                       : Icons.savings_rounded,
-                  color: isCompleted ? AppColors.income : AppColors.savings,
-                  size:  22,
+                  color: isCompleted ? AppColors.income : AppColors.primary,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: AppTheme.spacingM),
@@ -332,7 +331,9 @@ class _SavingsGoalCard extends ConsumerWidget {
                   children: [
                     Text(
                       goal.title,
-                      style: Theme.of(context).textTheme.bodyLarge
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     Text(
@@ -342,12 +343,12 @@ class _SavingsGoalCard extends ConsumerWidget {
                               ? 'Délai dépassé !'
                               : '$daysLeft jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: isCompleted
-                            ? AppColors.income
-                            : goal.isOverdue
-                                ? AppColors.expense
-                                : AppColors.textSecondary,
-                      ),
+                            color: isCompleted
+                                ? AppColors.income
+                                : goal.isOverdue
+                                    ? AppColors.expense
+                                    : AppColors.textSecondary,
+                          ),
                     ),
                   ],
                 ),
@@ -374,7 +375,7 @@ class _SavingsGoalCard extends ConsumerWidget {
                         children: [
                           Icon(
                             Icons.delete_outline_rounded,
-                            size:  18,
+                            size: 18,
                             color: AppColors.expense,
                           ),
                           SizedBox(width: 8),
@@ -399,7 +400,7 @@ class _SavingsGoalCard extends ConsumerWidget {
               Text(
                 '${formatter.format(goal.currentAmount)} Ar',
                 style: AppTextStyles.amountSmall.copyWith(
-                  color: isCompleted ? AppColors.income : AppColors.savings,
+                  color: isCompleted ? AppColors.income : AppColors.primary,
                 ),
               ),
               Text(
@@ -415,12 +416,12 @@ class _SavingsGoalCard extends ConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value:           goal.progress,
+              value: goal.progress,
               backgroundColor: isCompleted
                   ? AppColors.income.withValues(alpha: 0.15)
-                  : AppColors.savings.withValues(alpha: 0.15),
+                  : AppColors.primary.withValues(alpha: 0.15),
               valueColor: AlwaysStoppedAnimation<Color>(
-                isCompleted ? AppColors.income : AppColors.savings,
+                isCompleted ? AppColors.income : AppColors.primary,
               ),
               minHeight: 8,
             ),
@@ -432,9 +433,9 @@ class _SavingsGoalCard extends ConsumerWidget {
           Text(
             '${goal.progressPercent.toStringAsFixed(1)}%',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: isCompleted ? AppColors.income : AppColors.savings,
-              fontWeight: FontWeight.w600,
-            ),
+                  color: isCompleted ? AppColors.income : AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ],
       ),
@@ -462,25 +463,25 @@ class _SavingsGoalCard extends ConsumerWidget {
     await showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title:   const Text('Ajouter un montant'),
+        title: const Text('Ajouter un montant'),
         content: TextField(
-          controller:   ctrl,
+          controller: ctrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration:   const InputDecoration(
-            hintText:   'Montant en Ar',
+          decoration: const InputDecoration(
+            hintText: 'Montant en Ar',
             prefixText: 'Ar  ',
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:     const Text('Annuler'),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.savings,
-              minimumSize:     const Size(80, 40),
+              backgroundColor: AppColors.primary,
+              minimumSize: const Size(80, 40),
             ),
             onPressed: () async {
               final amount = double.tryParse(
@@ -495,7 +496,9 @@ class _SavingsGoalCard extends ConsumerWidget {
               ref.invalidate(savingsGoalsProvider);
               ref.invalidate(activeSavingsGoalsProvider);
 
-              if (context.mounted) Navigator.pop(context);
+              if (context.mounted) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
             },
             child: const Text('Ajouter'),
           ),
@@ -511,19 +514,21 @@ class _SavingsGoalCard extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title:   const Text('Supprimer l\'objectif ?'),
+        title: const Text('Supprimer l\'objectif ?'),
         content: const Text('Cette action est irréversible.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child:     const Text('Annuler'),
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(false),
+            child: const Text('Annuler'),
           ),
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: AppColors.expense,
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child:     const Text('Supprimer'),
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(true),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
