@@ -6,6 +6,8 @@ import '../../providers/providers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../data/models/models.dart';
 
+import '../../../core/services/preferences_service.dart';
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -655,7 +657,6 @@ class _ResetTile extends ConsumerWidget {
   }
 
   Future<void> _performReset(BuildContext context, WidgetRef ref) async {
-    // Affiche un loader
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -670,6 +671,9 @@ class _ResetTile extends ConsumerWidget {
       await Hive.box<CategoryModel>('categories').clear();
       await Hive.box<SavingsGoalModel>('savings_goals').clear();
 
+      // ← Ajouter cette ligne — remet l'onboarding à afficher
+      await PreferencesService.instance.setOnboardingDone(false);
+
       // Réinitialise les catégories par défaut
       await ref.read(categoryRepositoryProvider).seedDefaults();
 
@@ -681,13 +685,10 @@ class _ResetTile extends ConsumerWidget {
       ref.invalidate(activeSavingsGoalsProvider);
 
       if (context.mounted) {
-        // Ferme le loader
         Navigator.of(context, rootNavigator: true).pop();
-
-        // Message de succès
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Données réinitialisées avec succès'),
+            content: Text('Données réinitialisées avec succès. Veuillez relancer l\'application.'),
             backgroundColor: AppColors.income,
           ),
         );

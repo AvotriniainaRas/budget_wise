@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/theme.dart';
 import '../../navigation/app_router.dart';
+import '../../../core/services/preferences_service.dart';
 
 /// Écran de démarrage affiché au lancement de l'app.
 ///
@@ -18,16 +19,16 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double>   _fadeAnim;
-  late Animation<double>   _scaleAnim;
-  late Animation<double>   _slideAnim;
+  late Animation<double> _fadeAnim;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _slideAnim;
 
   @override
   void initState() {
     super.initState();
 
     _controller = AnimationController(
-      vsync:    this,
+      vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
 
@@ -35,14 +36,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve:  const Interval(0.0, 0.6, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
       ),
     );
 
     _scaleAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve:  const Interval(0.0, 0.6, curve: Curves.elasticOut),
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
       ),
     );
 
@@ -50,14 +51,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _slideAnim = Tween<double>(begin: 30.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve:  const Interval(0.4, 1.0, curve: Curves.easeOut),
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
       ),
     );
 
-    // Lance l'animation puis navigue
+    // // Lance l'animation puis navigue
+    // _controller.forward().then((_) async {
+    //   await Future.delayed(const Duration(milliseconds: 800));
+    //   if (mounted) context.go(AppRoutes.dashboard);
+    // });
     _controller.forward().then((_) async {
       await Future.delayed(const Duration(milliseconds: 800));
-      if (mounted) context.go(AppRoutes.dashboard);
+      if (!mounted) return;
+
+      // Vérifie si l'onboarding a déjà été vu
+      final prefs = PreferencesService.instance;
+      if (prefs.isOnboardingDone()) {
+        context.go(AppRoutes.dashboard);
+      } else {
+        context.go(AppRoutes.onboarding);
+      }
     });
   }
 
@@ -78,17 +91,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 // ── Logo animé ──────────────────────────
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: ScaleTransition(
                     scale: _scaleAnim,
                     child: Container(
-                      width:       110,
-                      height:      110,
-                      decoration:  BoxDecoration(
-                        color:        Colors.white.withValues(alpha: 0.15),
+                      width: 110,
+                      height: 110,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.3),
@@ -97,7 +109,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       ),
                       child: const Icon(
                         Icons.account_balance_wallet_rounded,
-                        size:  56,
+                        size: 56,
                         color: Colors.white,
                       ),
                     ),
@@ -114,7 +126,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     child: Text(
                       'BudgetWise',
                       style: AppTextStyles.displayLarge.copyWith(
-                        color:       Colors.white,
+                        color: Colors.white,
                         letterSpacing: -1,
                       ),
                     ),

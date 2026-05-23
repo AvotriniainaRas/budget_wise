@@ -18,12 +18,21 @@ class SavingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: FloatingActionButton.extended(
+      // Avant
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => context.push(AppRoutes.addSavingsGoal),
+      //   backgroundColor: AppColors.primary,
+      //   foregroundColor: Colors.white,
+      //   icon: const Icon(Icons.add_rounded),
+      //   label: const Text('Nouvel objectif'),
+      // ),
+
+      // Après
+      floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRoutes.addSavingsGoal),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Nouvel objectif'),
+        child: const Icon(Icons.add_rounded),
       ),
       body: SafeArea(
         child: CustomScrollView(

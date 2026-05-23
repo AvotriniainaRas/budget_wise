@@ -16,7 +16,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final summaryAsync      = ref.watch(monthlySummaryProvider);
+    final summaryAsync = ref.watch(monthlySummaryProvider);
     final transactionsAsync = ref.watch(transactionsProvider);
 
     return Scaffold(
@@ -33,12 +33,18 @@ class DashboardScreen extends ConsumerWidget {
             child: child,
           );
         },
-        child: FloatingActionButton.extended(
+        // child: FloatingActionButton.extended(
+        //   onPressed: () => context.push(AppRoutes.addTransaction),
+        //   backgroundColor: AppColors.primary,
+        //   foregroundColor: Colors.white,
+        //   icon: const Icon(Icons.add_rounded),
+        //   label: const Text('Ajouter'),
+        // ),
+        child: FloatingActionButton(
           onPressed: () => context.push(AppRoutes.addTransaction),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          icon: const Icon(Icons.add_rounded),
-          label: const Text('Ajouter'),
+          child: const Icon(Icons.add_rounded),
         ),
       ),
 
@@ -71,7 +77,9 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                           Text(
                             'Gérez votre budget',
-                            style: Theme.of(context).textTheme.bodyMedium
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
                                 ?.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
@@ -79,8 +87,8 @@ class DashboardScreen extends ConsumerWidget {
                       // Avatar placeholder
                       CircleAvatar(
                         radius: 22,
-                        backgroundColor: AppColors.primary
-                            .withValues(alpha: 0.15),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.15),
                         child: const Icon(
                           Icons.person_rounded,
                           color: AppColors.primary,
@@ -163,7 +171,8 @@ class DashboardScreen extends ConsumerWidget {
                       child: EmptyState(
                         icon: Icons.receipt_long_rounded,
                         title: 'Aucune transaction',
-                        subtitle: 'Appuyez sur + pour ajouter\nvotre première transaction.',
+                        subtitle:
+                            'Appuyez sur + pour ajouter\nvotre première transaction.',
                       ),
                     );
                   }

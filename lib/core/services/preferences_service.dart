@@ -31,4 +31,16 @@ class PreferencesService {
     final index = _box.get(_themeKey, defaultValue: 0) as int;
     return ThemeMode.values[index];
   }
+
+  static const String _onboardingKey = 'onboarding_done';
+
+  /// Retourne true si l'onboarding a déjà été vu.
+  bool isOnboardingDone() {
+    return _box.get(_onboardingKey, defaultValue: false) as bool;
+  }
+
+  /// Marque l'onboarding comme terminé.
+  Future<void> setOnboardingDone([bool done = true]) async {
+    await _box.put(_onboardingKey, done);
+  }
 }

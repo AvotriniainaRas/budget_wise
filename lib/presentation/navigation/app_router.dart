@@ -10,6 +10,8 @@ import 'app_scaffold.dart';
 import '../screens/splash/splash_screen.dart';
 import '../../core/utils/transitions.dart';
 
+import '../screens/onboarding/onboarding_screen.dart'; // ← ajouter
+
 /// Identifiants de routes — jamais de strings en dur dans les widgets.
 abstract final class AppRoutes {
   static const String splash = '/splash';
@@ -21,6 +23,7 @@ abstract final class AppRoutes {
   static const String addSavingsGoal = '/savings/add';
   static const String statistics = '/statistics';
   static const String settings = '/settings';
+  static const String onboarding = '/onboarding';
 }
 
 /// Configuration centrale de la navigation.
@@ -99,6 +102,11 @@ final appRouter = GoRouter(
         key: state.pageKey,
         child: const AddSavingsGoalScreen(),
       ),
+    ),
+    // Dans GoRouter — hors du ShellRoute
+    GoRoute(
+      path: AppRoutes.onboarding,
+      builder: (context, state) => const OnboardingScreen(),
     ),
   ],
 );

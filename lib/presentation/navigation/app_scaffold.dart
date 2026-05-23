@@ -42,7 +42,7 @@ class _BottomNav extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.dashboard_outlined),
           selectedIcon: Icon(Icons.dashboard_rounded),
-          label: 'Tableau de bord',
+          label: 'Dashboard',
         ),
         NavigationDestination(
           icon: Icon(Icons.receipt_long_outlined),
