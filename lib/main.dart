@@ -26,6 +26,9 @@ Future<void> main() async {
   await Hive.openBox<CategoryModel>(HiveBoxNames.categories);
   await Hive.openBox<SavingsGoalModel>(HiveBoxNames.savingsGoals);
 
+  // Ajouter après les autres openBox
+  await Hive.openBox('settings'); // Boîte générique sans type
+
   runApp(
     const ProviderScope(
       child: BudgetWiseApp(),

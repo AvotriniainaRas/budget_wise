@@ -234,24 +234,25 @@ class _ThemeSelector extends ConsumerWidget {
                 label: 'Clair',
                 icon: Icons.light_mode_rounded,
                 selected: currentMode == ThemeMode.light,
-                onTap: () => ref.read(themeModeProvider.notifier).state =
-                    ThemeMode.light,
+                onTap: () => ref
+                    .read(themeModeProvider.notifier)
+                    .setThemeMode(ThemeMode.light),
               ),
-              const SizedBox(width: AppTheme.spacingS),
               _ThemeOption(
                 label: 'Sombre',
                 icon: Icons.dark_mode_rounded,
                 selected: currentMode == ThemeMode.dark,
-                onTap: () =>
-                    ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
+                onTap: () => ref
+                    .read(themeModeProvider.notifier)
+                    .setThemeMode(ThemeMode.dark),
               ),
-              const SizedBox(width: AppTheme.spacingS),
               _ThemeOption(
                 label: 'Système',
                 icon: Icons.settings_suggest_rounded,
                 selected: currentMode == ThemeMode.system,
-                onTap: () => ref.read(themeModeProvider.notifier).state =
-                    ThemeMode.system,
+                onTap: () => ref
+                    .read(themeModeProvider.notifier)
+                    .setThemeMode(ThemeMode.system),
               ),
             ],
           ),
