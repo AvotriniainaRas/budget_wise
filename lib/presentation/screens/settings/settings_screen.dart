@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/theme.dart';
 import '../../providers/providers.dart';
 
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../../data/models/models.dart';
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -101,15 +104,31 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   _InfoTile(
                     icon: Icons.school_rounded,
-                    title: 'Architecture',
-                    trailing: 'Clean Architecture',
+                    title: 'Developpé par',
+                    trailing: 'Avotriniaina Ras',
                   ),
                 ],
               ),
             ),
 
             const SliverToBoxAdapter(
+              child: SizedBox(height: AppTheme.spacingM),
+            ),
+
+            const SliverToBoxAdapter(
+              child: _Section(
+                title: 'Zone de danger',
+                children: [
+                  _ResetTile(),
+                ],
+              ),
+            ),
+
+            const SliverToBoxAdapter(
               child: SizedBox(height: AppTheme.spacingXL),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: AppTheme.spacingM),
             ),
           ],
         ),
@@ -493,5 +512,195 @@ class _InfoTile extends StatelessWidget {
             ),
       ),
     );
+  }
+}
+
+class _ResetTile extends ConsumerWidget {
+  const _ResetTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingM,
+        vertical: AppTheme.spacingXS,
+      ),
+      leading: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: AppColors.expense.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        ),
+        child: const Icon(
+          Icons.delete_forever_rounded,
+          color: AppColors.expense,
+          size: 18,
+        ),
+      ),
+      title: Text(
+        'Réinitialiser les données',
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: AppColors.expense,
+            ),
+      ),
+      subtitle: Text(
+        'Supprimer toutes les transactions, catégories et objectifs',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.expense,
+      ),
+      onTap: () => _confirmReset(context, ref),
+    );
+  }
+
+  Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
+    // ── Première confirmation ────────────────────────
+    final firstConfirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              color: AppColors.expense,
+            ),
+            SizedBox(width: AppTheme.spacingS),
+            Text('Réinitialiser ?'),
+          ],
+        ),
+        content: const Text(
+          'Toutes vos données seront supprimées définitivement :\n\n'
+          '• Toutes les transactions\n'
+          '• Toutes les catégories\n'
+          '• Tous les objectifs d\'épargne\n\n'
+          'Cette action est IRRÉVERSIBLE.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.expense,
+            ),
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(true),
+            child: const Text('Continuer'),
+          ),
+        ],
+      ),
+    );
+
+    if (firstConfirm != true || !context.mounted) return;
+
+    // ── Deuxième confirmation — saisie de texte ──────
+    final textCtrl = TextEditingController();
+    final secondConfirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirmation finale'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tapez "SUPPRIMER" pour confirmer la réinitialisation :',
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            TextField(
+              controller: textCtrl,
+              autofocus: true,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                hintText: 'SUPPRIMER',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.expense,
+            ),
+            onPressed: () {
+              final confirmed = textCtrl.text.trim() == 'SUPPRIMER';
+              Navigator.of(context, rootNavigator: true).pop(confirmed);
+            },
+            child: const Text('Réinitialiser'),
+          ),
+        ],
+      ),
+    );
+
+    textCtrl.dispose();
+    if (secondConfirm != true || !context.mounted) return;
+
+    // ── Exécution du reset ───────────────────────────
+    await _performReset(context, ref);
+  }
+
+  Future<void> _performReset(BuildContext context, WidgetRef ref) async {
+    // Affiche un loader
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Vide toutes les boîtes Hive
+      await Hive.box<TransactionModel>('transactions').clear();
+      await Hive.box<CategoryModel>('categories').clear();
+      await Hive.box<SavingsGoalModel>('savings_goals').clear();
+
+      // Réinitialise les catégories par défaut
+      await ref.read(categoryRepositoryProvider).seedDefaults();
+
+      // Invalide tous les providers
+      ref.invalidate(transactionsProvider);
+      ref.invalidate(monthlySummaryProvider);
+      ref.invalidate(categoriesProvider);
+      ref.invalidate(savingsGoalsProvider);
+      ref.invalidate(activeSavingsGoalsProvider);
+
+      if (context.mounted) {
+        // Ferme le loader
+        Navigator.of(context, rootNavigator: true).pop();
+
+        // Message de succès
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Données réinitialisées avec succès'),
+            backgroundColor: AppColors.income,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur : $e'),
+            backgroundColor: AppColors.expense,
+          ),
+        );
+      }
+    }
   }
 }
