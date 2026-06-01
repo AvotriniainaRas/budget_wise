@@ -97,3 +97,10 @@ final monthlySummaryProvider = FutureProvider((ref) async {
   final usecase = ref.watch(getMonthlySummaryProvider);
   return usecase(date.year, date.month);
 });
+
+/// Solde total de toutes les transactions (tous les mois confondus).
+final totalBalanceProvider = FutureProvider<double>((ref) async {
+  final repo = ref.watch(transactionRepositoryProvider);
+  final all  = await repo.getAll();
+  return all.fold<double>(0.0, (sum, t) => sum + t.signedAmount);
+});
