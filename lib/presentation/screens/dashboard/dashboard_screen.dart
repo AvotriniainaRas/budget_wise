@@ -90,7 +90,7 @@ class DashboardScreen extends ConsumerWidget {
                         backgroundColor:
                             AppColors.primary.withValues(alpha: 0.15),
                         child: const Icon(
-                          Icons.person_rounded,
+                          Icons.account_balance_wallet_rounded,
                           color: AppColors.primary,
                         ),
                       ),
