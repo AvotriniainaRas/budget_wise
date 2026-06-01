@@ -95,20 +95,18 @@ class SettingsScreen extends ConsumerWidget {
                 title: 'À propos',
                 children: [
                   _InfoTile(
+                    icon: Icons.account_balance_wallet_rounded,
+                    title: 'BudgetWise',
+                    trailing: 'Gestion de budget personnel',
+                  ),
+                  
+                  _InfoTile(
                     icon: Icons.info_outline_rounded,
                     title: 'Version',
                     trailing: '1.0.0',
                   ),
-                  _InfoTile(
-                    icon: Icons.code_rounded,
-                    title: 'Développé avec Flutter',
-                    trailing: '❤️',
-                  ),
-                  _InfoTile(
-                    icon: Icons.school_rounded,
-                    title: 'Developpé par',
-                    trailing: 'Avotriniaina Ras',
-                  ),
+
+                  const _ContactTile(),
                 ],
               ),
             ),
@@ -688,7 +686,8 @@ class _ResetTile extends ConsumerWidget {
         Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Données réinitialisées avec succès. Veuillez relancer l\'application.'),
+            content: Text(
+                'Données réinitialisées avec succès. Veuillez relancer l\'application.'),
             backgroundColor: AppColors.income,
           ),
         );
@@ -704,5 +703,198 @@ class _ResetTile extends ConsumerWidget {
         );
       }
     }
+  }
+}
+
+class _ContactTile extends StatelessWidget {
+  const _ContactTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingM,
+        vertical:   AppTheme.spacingXS,
+      ),
+      leading: Container(
+        width:       36,
+        height:      36,
+        decoration:  BoxDecoration(
+          color:        AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        ),
+        child: const Icon(
+          Icons.contact_support_rounded,
+          color: AppColors.primary,
+          size:  18,
+        ),
+      ),
+      title: Text(
+        'Nous contacter',
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.primary,
+      ),
+      onTap: () => _showContactDialog(context),
+    );
+  }
+
+  void _showContactDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+        ),
+        title: Row(
+          children: [
+            Container(
+              width:       40,
+              height:      40,
+              decoration:  BoxDecoration(
+                color:        AppColors.primary,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              ),
+              child: const Icon(
+                Icons.account_balance_wallet_rounded,
+                color: Colors.white,
+                size:  20,
+              ),
+            ),
+            const SizedBox(width: AppTheme.spacingM),
+            const Text('BudgetWise'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Développeur
+            Container(
+              padding:    const EdgeInsets.all(AppTheme.spacingM),
+              decoration: BoxDecoration(
+                color:        AppColors.primary.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius:          24,
+                    backgroundColor: AppColors.primary,
+                    child: const Text(
+                      'AR',
+                      style: TextStyle(
+                        color:      Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize:   16,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.spacingM),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Avotriniaina Rasamimanana',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color:      AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        'Développeur Web & Mobile',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppTheme.spacingM),
+
+            // Coordonnées
+            _ContactItem(
+              icon:  Icons.phone_rounded,
+              label: 'Téléphone',
+              value: '+261 38 09 993 36',
+              color: AppColors.income,
+            ),
+            _ContactItem(
+              icon:  Icons.email_rounded,
+              label: 'Email',
+              value: 'avotriniainaras2@gmail.com',
+              color: AppColors.primary,
+            ),
+            _ContactItem(
+              icon:  Icons.code_rounded,
+              label: 'GitHub',
+              value: 'github.com/AvotriniainaRas',
+              color: AppColors.secondary,
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () =>
+                Navigator.of(context, rootNavigator: true).pop(),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContactItem extends StatelessWidget {
+  const _ContactItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String   label;
+  final String   value;
+  final Color    color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppTheme.spacingS),
+      child: Row(
+        children: [
+          Container(
+            width:       32,
+            height:      32,
+            decoration:  BoxDecoration(
+              color:        color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: AppTheme.spacingM),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
