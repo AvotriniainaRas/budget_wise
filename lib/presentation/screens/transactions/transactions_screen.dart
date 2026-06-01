@@ -9,6 +9,8 @@ import '../../widgets/common/empty_state.dart';
 import '../../widgets/common/month_selector.dart';
 import '../../widgets/common/transaction_list_item.dart';
 
+import 'package:intl/intl.dart';
+
 class TransactionsScreen extends ConsumerWidget {
   const TransactionsScreen({super.key});
 
@@ -297,25 +299,83 @@ class _QuickSummary extends ConsumerWidget {
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             border: Border.all(color: AppColors.divider),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SummaryItem(
-                label:  '$count transaction${count > 1 ? 's' : ''}',
-                icon:   Icons.receipt_long_rounded,
-                color:  AppColors.primary,
+
+              // ── Ligne 1 : nombre de transactions ────────
+              Row(
+                children: [
+                  const Icon(
+                    Icons.receipt_long_rounded,
+                    color: AppColors.primary,
+                    size:  16,
+                  ),
+                  const SizedBox(width: AppTheme.spacingXS),
+                  Text(
+                    '$count transaction${count > 1 ? 's' : ''}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color:      AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              _Divider(),
-              _SummaryItem(
-                label:  '+${totalIncome.toStringAsFixed(0)} Ar',
-                icon:   Icons.arrow_upward_rounded,
-                color:  AppColors.income,
-              ),
-              _Divider(),
-              _SummaryItem(
-                label:  '-${totalExpense.toStringAsFixed(0)} Ar',
-                icon:   Icons.arrow_downward_rounded,
-                color:  AppColors.expense,
+
+              const SizedBox(height: AppTheme.spacingS),
+              const Divider(height: 1),
+              const SizedBox(height: AppTheme.spacingS),
+
+              // ── Ligne 2 : revenus et dépenses ───────────
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.arrow_upward_rounded,
+                          color: AppColors.income,
+                          size:  16,
+                        ),
+                        const SizedBox(width: AppTheme.spacingXS),
+                        Expanded(
+                          child: Text(
+                            '+${NumberFormat('#,###', 'fr_FR').format(totalIncome)} Ar',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                              color:      AppColors.income,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.arrow_downward_rounded,
+                          color: AppColors.expense,
+                          size:  16,
+                        ),
+                        const SizedBox(width: AppTheme.spacingXS),
+                        Expanded(
+                          child: Text(
+                            '-${NumberFormat('#,###', 'fr_FR').format(totalExpense)} Ar',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                              color:      AppColors.expense,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -325,45 +385,45 @@ class _QuickSummary extends ConsumerWidget {
   }
 }
 
-class _SummaryItem extends StatelessWidget {
-  const _SummaryItem({
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
+// class _SummaryItem extends StatelessWidget {
+//   const _SummaryItem({
+//     required this.label,
+//     required this.icon,
+//     required this.color,
+//   });
 
-  final String   label;
-  final IconData icon;
-  final Color    color;
+//   final String   label;
+//   final IconData icon;
+//   final Color    color;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 16),
-        const SizedBox(width: AppTheme.spacingXS),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color:      color,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Icon(icon, color: color, size: 16),
+//         const SizedBox(width: AppTheme.spacingXS),
+//         Text(
+//           label,
+//           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+//             color:      color,
+//             fontWeight: FontWeight.w600,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
-class _Divider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width:  1,
-      height: 24,
-      color:  AppColors.divider,
-    );
-  }
-}
+// class _Divider extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width:  1,
+//       height: 24,
+//       color:  AppColors.divider,
+//     );
+//   }
+// }
 
 class _FilterChip extends StatelessWidget {
   const _FilterChip({
